@@ -15,20 +15,26 @@ b:label(w:label())
 b:size(200, 200)
 b:position(150, 200)
 
+c = Widget.newButton("POWERON")
+c:label(w:label())
+c:size(200, 200)
+c:position(150, 200)
+
 b:onClick(function(source)
-    GUI.displayPage(tvPage)
+    tvPage:present()
 end
 )
 
-print(w:size())
+c:onClick(function(source)
+    homePage:present()
+end
+)
 
 homePage = Page.new("Home")
 tvPage = Page.new("TV")
 
 b:attachToPage(homePage)
+c:attachToPage(tvPage)
 w:attachToPage(tvPage)
 
-GUI.displayPage(homePage)
-
-print(homePage)
-print(tvPage)
+tvPage:present()

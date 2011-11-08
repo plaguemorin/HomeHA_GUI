@@ -29,6 +29,7 @@ void MainWindow::presentPage(APage * page) {
 
     this->currentPage = page;
     this->currentPage->setParent(this);
+    this->currentPage->show();
 
-    qDebug() << "Current displaied page:" << this->currentPage->name();
+    qDebug() << "Current page presented:" << this->currentPage->name();
 }

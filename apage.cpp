@@ -5,9 +5,9 @@ APage::APage(QWidget *parent) : QWidget(parent)
 }
 
 const char * APage::name() {
-    return this->pageName.toUtf8().constData();
+    return this->pageName.toAscii().constData();
 }
 
 void APage::setName(const char * newName) {
-    this->pageName = newName;
+    this->pageName = QString(newName);
 }

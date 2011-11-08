@@ -5,7 +5,6 @@
 #define WIDGET "Widget"
 
 class APage;
-class AWidget;
 
 int SCRIPT_LibraryGUI_Load(lua_State *);
 int SCRIPT_LibraryWidget_Load(lua_State *);

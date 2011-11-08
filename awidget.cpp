@@ -14,7 +14,7 @@ AWidgetType AWidget::type() {
 }
 
 const char * AWidget::name() {
-    return this->tag.toUtf8().constData();
+    return this->tag.toAscii().constData();
 }
 
 void AWidget::setName(const char * newName) {

@@ -82,8 +82,19 @@ static int ScriptPage_New(lua_State *L) {
         (*bar)->setName(x);
     }
 
-    addpage((*bar));
+    addpage(*bar);
     return 1;
+}
+
+static int ScriptPage_Present(lua_State *L) {
+    APage ** self;
+    self = checkpage(L, 1);
+
+    printf("About to active page %s\n", (*self)->name());
+
+    MainWindow::getInstance()->presentPage(*self);
+
+    return 0;
 }
 
 /*-----------------------------------------------------------------------------------------*/
@@ -102,7 +113,8 @@ static int ScriptPage__tostring(lua_State *L) {
 
 
 static const luaL_Reg pageMethodsLib[] = {
-    {"new", ScriptPage_New},
+    { "new", ScriptPage_New },
+    { "present", ScriptPage_Present },
     { NULL, NULL }
 };
 
