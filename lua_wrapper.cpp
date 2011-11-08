@@ -32,6 +32,7 @@ void SCRIPT_StartWrapper() {
     /* Register Custom libraries */
     SCRIPT_LibraryGUI_Load(L);
     SCRIPT_LibraryWidget_Load(L);
+    SCRIPT_LibraryPage_Load(L);
 }
 
 bool SCRIPT_ExecuteInitial() {

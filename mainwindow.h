@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+class APage;
 
 class MainWindow : public QMainWindow
 {
@@ -11,9 +12,14 @@ public:
 
     static MainWindow * getInstance();
 
+    void presentPage(APage *);
+
 signals:
 
 public slots:
+
+private:
+    APage * currentPage;
 
 };
 

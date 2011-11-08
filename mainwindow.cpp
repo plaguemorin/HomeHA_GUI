@@ -7,16 +7,28 @@
 #include <QtCore/QSettings>
 
 #include "mainwindow.h"
-#include "lua_wrapper.h"
+#include "apage.h"
 
 MainWindow * instance = NULL;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     instance = this;
-    SCRIPT_LoadPage("home");
+    this->currentPage = NULL;
 }
 
 MainWindow * MainWindow::getInstance() {
     return instance;
+}
+
+void MainWindow::presentPage(APage * page) {
+    if (this->currentPage) {
+        qDebug() << "Hidding current page:" << this->currentPage->name();
+        this->currentPage->setParent(NULL);
+    }
+
+    this->currentPage = page;
+    this->currentPage->setParent(this);
+
+    qDebug() << "Current displaied page:" << this->currentPage->name();
 }

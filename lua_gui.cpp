@@ -43,6 +43,15 @@ static int SCRIPT_GUI_BackgroundImage(lua_State * L) {
     return 0;
 }
 
+static int SCRIPT_GUI_DisplayPage(lua_State * L) {
+    APage ** page;
+
+    page = checkpage(L, 1);
+    MainWindow::getInstance()->presentPage(*page);
+
+    return 0;
+}
+
 static int SCRIPT_GUI_Version(lua_State * L) {
     lua_pushnumber(L, 1);
     return 1;
@@ -52,6 +61,7 @@ static const luaL_Reg guiLIB[]  = {
     { "backgroundImage", SCRIPT_GUI_BackgroundImage },
     { "backgroundColor", SCRIPT_GUI_BackgroundColor },
     { "version", SCRIPT_GUI_Version },
+    { "displayPage", SCRIPT_GUI_DisplayPage },
     { NULL, NULL }
 };
 

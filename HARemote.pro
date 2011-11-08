@@ -13,7 +13,9 @@ SOURCES += \
     lua_widget.cpp \
     awidget.cpp \
     awidgetlabel.cpp \
-    awidgetbutton.cpp
+    awidgetbutton.cpp \
+    apage.cpp \
+    lua_page.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -21,7 +23,8 @@ HEADERS += \
     script_internal.h \
     awidget.h \
     awidgetlabel.h \
-    awidgetbutton.h
+    awidgetbutton.h \
+    apage.h
 
 OTHER_FILES += \
     main.lua

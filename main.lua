@@ -16,11 +16,19 @@ b:size(200, 200)
 b:position(150, 200)
 
 b:onClick(function(source)
-    a = Widget.retreive(source)
-    a:label("CLICKED !")
-    w:label(source)
-    a:destory()
+    GUI.displayPage(tvPage)
 end
 )
 
 print(w:size())
+
+homePage = Page.new("Home")
+tvPage = Page.new("TV")
+
+b:attachToPage(homePage)
+w:attachToPage(tvPage)
+
+GUI.displayPage(homePage)
+
+print(homePage)
+print(tvPage)

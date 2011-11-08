@@ -13,8 +13,6 @@ extern "C" {
 #include "awidgetlabel.h"
 #include "awidgetbutton.h"
 
-#define WIDGET "Widget"
-
 static QList<AWidget *> listOfWidgets;
 
 
@@ -99,7 +97,6 @@ static int ScriptWidget_NewLabel(lua_State *L) {
         (*bar)->setName(x);
     }
 
-    (*bar)->setParent(MainWindow::getInstance());
     addwidget((*bar));
 
     return 1;
@@ -117,12 +114,22 @@ static int ScriptWidget_NewButton(lua_State *L) {
         (*bar)->setName(x);
     }
 
-    (*bar)->setParent(MainWindow::getInstance());
     addwidget((*bar));
 
     return 1;
 }
 
+static int ScriptWidget_PageAttach(lua_State *L) {
+    AWidget ** self;
+    APage ** page;
+
+    self = checkwidget(L, 1);
+    page = checkpage(L, 2);
+
+    (*self)->setParent((QWidget *) *page);
+
+    return 0;
+}
 
 static int ScriptWidget_Size(lua_State *L) {
     AWidget ** self;
@@ -252,6 +259,8 @@ static const luaL_Reg widgetMethodsLib[] = {
     { "newButton", ScriptWidget_NewButton },
 
     { "destory", ScriptWidget_Delete },
+
+    { "attachToPage", ScriptWidget_PageAttach },
 
     { "name", ScriptWidget_Name },
     { "size", ScriptWidget_Size },
