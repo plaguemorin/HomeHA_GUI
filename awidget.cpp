@@ -1,9 +1,9 @@
 #include <QWidget>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QDebug>
 
 #include "lua_wrapper.h"
-
 #include "awidget.h"
 #include "aimage.h"
 
@@ -13,10 +13,12 @@ AWidget::AWidget(QWidget * parent) : QWidget(parent)
     this->tag = NULL;
     this->theWidget = new QLabel(this);
     this->theWidget->setAlignment(Qt::AlignCenter);
+
+    this->setAutoFillBackground(true);
 }
 
 AWidget::~AWidget() {
-
+    delete this->theWidget;
 }
 
 const char * AWidget::name() {
@@ -110,24 +112,47 @@ void AWidget::set_callback_click(int c) { this->callback_click = c; }
 void AWidget::set_callback_longhold(int c) { this->callback_hold = c; }
 
 void AWidget::setBackgroundColor(int r, int g, int b) {
-    QPalette pal = this->theWidget->palette();
+    qDebug() << "Setting RGB Background of" << name() << "to" << r << g << b;
 
-    this->theWidget->setPalette(pal);
+    setImage(NULL);
+
+    QPalette pal = this->palette();
+    QBrush background = pal.brush(this->backgroundRole());
+    background.setColor(QColor(r,g,b));
+    pal.setBrush(this->backgroundRole(), background);
+    this->setPalette(pal);
 }
 
 void AWidget::setImage(AImage * a) {
-    qDebug() << "Setting image" << a->name() << "as background of widget" << name();
+
+    if (a) {
+        qDebug() << "Setting image" << a->name() << "as background of widget" << name();
+    } else if (this->widgetBgImage) {
+        qDebug() << "Removing background image of" << name();
+    }
+
     this->widgetBgImage = a;
 
-    if (this->widgetBgImage) {
-        this->theWidget->setAutoFillBackground(true);
+    QPalette pal = this->palette();
+    QBrush background = pal.brush(this->backgroundRole());
 
-        QPalette pal = this->theWidget->palette();
-        pal.setBrush(this->theWidget->backgroundRole(), QBrush(*a->qImage()));
-        this->theWidget->setPalette(pal);
+    if (this->widgetBgImage) {
+        background.setTextureImage(*this->widgetBgImage->qImage());
+    } else {
+        background.setStyle(Qt::SolidPattern);
     }
+
+    pal.setBrush(this->backgroundRole(), background);
+    this->setPalette(pal);
 }
 
 AImage * AWidget::image() {
     return this->widgetBgImage;
 }
+
+void AWidget::paintEvent(QPaintEvent * paintEvent) {
+    paintEvent->accept();
+    //QWidget::paintEvent(paintEvent);
+}
+
+

@@ -201,16 +201,15 @@ static int ScriptWidget_BackgroundColor(lua_State *L) {
     float r, g, b;
 
     self = checkwidget(L, 1);
-    r = luaL_optnumber(L, 2, -1);
 
-    if (r != -1) {
+   if (lua_isnumber(L, 2)) {
+        r = luaL_checknumber(L, 2);
         g = luaL_checknumber(L, 3);
         b = luaL_checknumber(L, 4);
 
         (*self)->setBackgroundColor(r * 255.0, g * 255.0, b * 255.0);
         return 0;
     } else {
-
         return 0;
     }
 }

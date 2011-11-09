@@ -63,6 +63,32 @@ int ScriptImage_Load(lua_State *L) {
     return 1;
 }
 
+static int ScriptImage_Copy(lua_State *L) {
+    AImage * bar;
+    AImage ** self;
+
+    self = checkimage(L, 1);
+    bar = (*self)->copy();
+    putimage(L, bar);
+
+    return 1;
+}
+
+static int ScriptImage_Tint(lua_State *L) {
+    AImage ** self;
+
+    self = checkimage(L, 1);
+
+    (*self)->tint(
+                luaL_checknumber(L, 2) * 255.0,
+                luaL_checknumber(L, 3) * 255.0,
+                luaL_checknumber(L, 4) * 255.0,
+                luaL_checknumber(L, 5) * 255.0
+                );
+
+    return 0;
+}
+
 /*-----------------------------------------------------------------------------------------*/
 static int ScriptImage__gc(lua_State *L) {
     printf("Trashing node %p\n", checkimage(L, 1));
@@ -79,6 +105,8 @@ static int ScriptImage__tostring(lua_State *L) {
 
 static const luaL_Reg imageMethodsLib[] = {
     { "load", ScriptImage_Load },
+    { "clone", ScriptImage_Copy },
+    { "tint", ScriptImage_Tint },
     { NULL, NULL }
 };
 

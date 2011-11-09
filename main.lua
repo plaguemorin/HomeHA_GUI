@@ -16,15 +16,16 @@ w:image(image)
 
 
 b = Widget.new("POWEROFF")
-b:label(w:label())
+b:label("POWEROFF")
 b:size(200, 200)
 b:position(150, 200)
 
 c = Widget.new("POWERON")
-c:label(w:label())
+c:label("Poweron")
 c:position(150, 200)
 c:size(132, 109)
 c:image(image)
+
 
 b:onClick(function(source)
     tvPage:present()
@@ -43,4 +44,5 @@ b:attachToPage(homePage)
 c:attachToPage(tvPage)
 w:attachToPage(tvPage)
 
+-- GUI.backgroundColor(0.5, 0, 0)
 tvPage:present()

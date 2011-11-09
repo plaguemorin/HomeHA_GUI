@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QTime>
 #include <QBasicTimer>
+#include <QPaintEvent>
 
 class AImage;
 
@@ -55,7 +56,8 @@ protected:
     int callback_hold;
 
 protected:
-     void timerEvent(QTimerEvent *event);
+    void paintEvent(QPaintEvent *);
+    void timerEvent(QTimerEvent *event);
 };
 
 #endif // AWIDGET_H
