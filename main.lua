@@ -6,19 +6,25 @@
 
 print(GUI.version())
 
-w = Widget.newLabel("VOLUME")
-w:label("Volume")
-w:size(200, 200)
+image = Image.load("data/picture_frame.png")
 
-b = Widget.newButton("POWEROFF")
+
+w = Widget.new("VOLUME")
+w:label("Volume")
+w:size(132, 109)
+w:image(image)
+
+
+b = Widget.new("POWEROFF")
 b:label(w:label())
 b:size(200, 200)
 b:position(150, 200)
 
-c = Widget.newButton("POWERON")
+c = Widget.new("POWERON")
 c:label(w:label())
-c:size(200, 200)
 c:position(150, 200)
+c:size(132, 109)
+c:image(image)
 
 b:onClick(function(source)
     tvPage:present()

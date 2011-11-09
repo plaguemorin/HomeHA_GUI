@@ -10,11 +10,8 @@ extern "C" {
 #include "script_internal.h"
 #include "mainwindow.h"
 #include "awidget.h"
-#include "awidgetlabel.h"
-#include "awidgetbutton.h"
 
 static QList<AWidget *> listOfWidgets;
-
 
 static AWidget ** towidget(lua_State *L, int index) {
     AWidget ** bar;
@@ -47,7 +44,7 @@ static AWidget ** pushwidget(lua_State *L) {
     return bar;
 }
 
-static void putwidget(lua_State *L, AWidget * node) {
+void putwidget(lua_State *L, AWidget * node) {
     AWidget ** bar;
     bar = pushwidget(L);
     *bar = node;
@@ -85,36 +82,19 @@ static int ScriptWidget_ByName(lua_State *L) {
     return 1;
 }
 
-static int ScriptWidget_NewLabel(lua_State *L) {
+static int ScriptWidget_New(lua_State *L) {
     const char * x;
-    AWidgetLabel ** bar;
+    AWidget ** bar;
 
     x = luaL_optlstring(L, 1, NULL, NULL);
-    bar = (AWidgetLabel**) pushwidget(L);
+    bar = (AWidget**) pushwidget(L);
 
-    *bar = new AWidgetLabel();
+    *bar = new AWidget();
     if (x) {
         (*bar)->setName(x);
     }
 
-    addwidget((*bar));
-
-    return 1;
-}
-
-static int ScriptWidget_NewButton(lua_State *L) {
-    const char * x;
-    AWidgetButton ** bar;
-
-    x = luaL_optlstring(L, 1, NULL, NULL);
-    bar = (AWidgetButton**) pushwidget(L);
-
-    *bar = new AWidgetButton();
-    if (x) {
-        (*bar)->setName(x);
-    }
-
-    addwidget((*bar));
+    addwidget(*bar);
 
     return 1;
 }
@@ -216,6 +196,43 @@ static int ScriptWidget_Show(lua_State *L) {
     return 0;
 }
 
+static int ScriptWidget_BackgroundColor(lua_State *L) {
+    AWidget ** self;
+    float r, g, b;
+
+    self = checkwidget(L, 1);
+    r = luaL_optnumber(L, 2, -1);
+
+    if (r != -1) {
+        g = luaL_checknumber(L, 3);
+        b = luaL_checknumber(L, 4);
+
+        (*self)->setBackgroundColor(r * 255.0, g * 255.0, b * 255.0);
+        return 0;
+    } else {
+
+        return 0;
+    }
+}
+
+static int ScriptWidget_Image(lua_State *L) {
+    AWidget ** self;
+    AImage ** img;
+    self = checkwidget(L, 1);
+
+    if (lua_isuserdata(L, 2)) {
+        img = checkimage(L, 2);
+
+        (*self)->setImage(*img);
+        return 0;
+    } else {
+        putimage(L, (*self)->image());
+
+        return 1;
+    }
+
+}
+
 static int ScriptWidget_OnClick(lua_State *L) {
     AWidget ** self;
     self = checkwidget(L, 1);
@@ -255,9 +272,7 @@ static int ScriptWidget__tostring(lua_State *L) {
 
 static const luaL_Reg widgetMethodsLib[] = {
     { "retreive", ScriptWidget_ByName },
-    { "newLabel", ScriptWidget_NewLabel },
-    { "newButton", ScriptWidget_NewButton },
-
+    { "new", ScriptWidget_New },
     { "destory", ScriptWidget_Delete },
 
     { "attachToPage", ScriptWidget_PageAttach },
@@ -266,6 +281,8 @@ static const luaL_Reg widgetMethodsLib[] = {
     { "size", ScriptWidget_Size },
     { "position", ScriptWidget_Position },
     { "label", ScriptWidget_Label },
+    { "image", ScriptWidget_Image },
+    { "background", ScriptWidget_BackgroundColor },
 
     { "hide", ScriptWidget_Hide },
     { "show", ScriptWidget_Show },

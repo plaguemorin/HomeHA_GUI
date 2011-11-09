@@ -5,8 +5,7 @@ class AWidget;
 
 void SCRIPT_StartWrapper();
 bool SCRIPT_ExecuteInitial();
-bool SCRIPT_LoadPage(const char *);
 
-void SCRIPT_DoCallback_Click(AWidget *);
+void SCRIPT_DoCallback_Widget(AWidget *, int);
 
 #endif // LUA_WRAPPER_H

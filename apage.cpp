@@ -2,12 +2,18 @@
 
 APage::APage(QWidget *parent) : QWidget(parent)
 {
+    this->pageName = NULL;
 }
 
 const char * APage::name() {
-    return this->pageName.toAscii().constData();
+    return (const char *) this->pageName;
 }
 
 void APage::setName(const char * newName) {
-    this->pageName = QString(newName);
+    if (this->pageName) {
+        free(this->pageName);
+    }
+
+    this->pageName = (char *)malloc(sizeof(char) * (strlen(newName) + 1));
+    strcpy(this->pageName, newName);
 }

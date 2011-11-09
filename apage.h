@@ -16,7 +16,7 @@ signals:
 public slots:
 
 private:
-    QString pageName;
+    char * pageName;
 };
 
 #endif // APAGE_H

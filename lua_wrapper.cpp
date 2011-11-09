@@ -33,6 +33,7 @@ void SCRIPT_StartWrapper() {
     SCRIPT_LibraryGUI_Load(L);
     SCRIPT_LibraryWidget_Load(L);
     SCRIPT_LibraryPage_Load(L);
+    SCRIPT_LibraryImage_Load(L);
 }
 
 bool SCRIPT_ExecuteInitial() {
@@ -52,14 +53,8 @@ bool SCRIPT_ExecuteInitial() {
     return (s != 0) ? false : true;
 }
 
-bool SCRIPT_LoadPage(const char * pageName) {
-    qDebug() << "Loading page" << pageName;
-
-    return true;
-}
-
-void SCRIPT_DoCallback_Click(AWidget * widget) {
-    lua_rawgeti(L, LUA_REGISTRYINDEX, widget->get_callback_click());
-    lua_pushfstring(L, "%s", widget->name());
+void SCRIPT_DoCallback_Widget(AWidget * widget, int callback) {
+    lua_rawgeti(L, LUA_REGISTRYINDEX, callback);
+    putwidget(L, widget);
     lua_pcall(L, 1, 0, 0);
 }
