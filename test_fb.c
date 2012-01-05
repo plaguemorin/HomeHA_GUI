@@ -44,6 +44,16 @@ struct bmpfile_info {
 };
 #pragma pack(0)
 
+struct Surface {
+    unsigned int xres;
+    unsigned int yres;
+
+    unsigned int format;
+    unsigned int line_lenght;
+
+    unsigned char * data;
+};
+
 int fbfd;
 struct fb_fix_screeninfo finfo;
 struct fb_var_screeninfo vinfo;
@@ -98,6 +108,31 @@ static void print_var_info(const struct fb_var_screeninfo *var, const char *s) {
     printf("sync            = %d\n", var->sync);
     printf("vmode           = %d\n\n", var->vmode);
 }
+
+int copy(struct Surface *from, struct Surface *to, unsigned int x, unsigned int y) {
+    int i;
+    int copy_ll;
+    int copy_yres;
+
+    copy_ll = from->line_length;
+    copy_yres = to->yres;
+
+    /* */
+    if (from->line_length > to->line_length - x) {
+        copy_ll = to->line_length - x;
+    }
+
+    if (from->y_res > to->y_res - y) {
+        copy_yres = to->y_res - y;
+    }
+
+    for (i = 0; i <= copy_res; i++) {
+        memcpy( &from->data[(from->line_length * i)],
+                &to->data[(to->line_length * (y + i)) + x],
+                copy_ll );
+    }
+}
+
 
 int open_fb(char * fbdev) {
     data = (unsigned char *) MAP_FAILED;
