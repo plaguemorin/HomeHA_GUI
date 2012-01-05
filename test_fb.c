@@ -195,7 +195,7 @@ int close_fb(struct Surface * surface) {
     }
 }
 
-void show_bmp(const char *bmp) {
+void show_bmp(const char *bmp, struct Surface * sur) {
     int bmpfd;
     struct bmpfile_header hrd;
     struct bmpfile_info bmi;
@@ -208,7 +208,7 @@ void show_bmp(const char *bmp) {
     if (bmi.width != vinfo.xres || bmi.height != vinfo.yres || bmi.bits != vinfo.bits_per_pixel) {
         printf("Unsupported bitmap: %s is %dx%d (%d) but %dx%d (%d) was expected\n", bmp, bmi.width, bmi.height, bmi.bits, vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
     } else {
-        read(bmpfd, data, memsize);
+        read(bmpfd, sur->data, memsize);
     }
     close(bmpfd);
 }
