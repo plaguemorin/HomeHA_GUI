@@ -19,8 +19,6 @@
 #include FT_FREETYPE_H
 
 char * fb_dev = "/dev/fb0";
-unsigned char * data;
-__u32 memsize;
 
 #pragma pack(1)
 struct bmpfile_header {
@@ -52,11 +50,19 @@ struct Surface {
     unsigned int line_lenght;
 
     unsigned char * data;
+
+    void * app_resereved;
+    
+    /* Virtual Mehtod to call when we need to destory this surface */
+    int (* destroy)(struct Surface *);
 };
 
-int fbfd;
-struct fb_fix_screeninfo finfo;
-struct fb_var_screeninfo vinfo;
+struct Surface_ScreenFrameBuffer {
+    int fbfd;
+    struct fb_fix_screeninfo finfo;
+    struct fb_var_screeninfo vinfo;
+    __u32 memsize;
+};
 
 static void print_fixed_info(const struct fb_fix_screeninfo *fixed, const char *s) {
     static const char *visuals[] = { "MONO01", "MONO10", "TRUECOLOR", "PSEUDOCOLOR", "DIRECTCOLOR", "STATIC_PSEUDOCOLOR" };
@@ -134,49 +140,58 @@ int copy(struct Surface *from, struct Surface *to, unsigned int x, unsigned int 
 }
 
 
-int open_fb(char * fbdev) {
-    data = (unsigned char *) MAP_FAILED;
-    memsize = 0;
+struct Surface * open_fb(char * fbdev) {
+    struct Surface * sur;
+    struct Surface_ScreenFrameBuffer * app;
+    
+    sur = malloc(sizeof(struct Surface));
+    app = malloc(sizeof(struct Surface_ScreenFrameBuffer));
+    
+    sur->app_reserved = app;
+    sur->data = (unsigned char *) MAP_FAILED;
+    app->memsize = 0;
 
-    fbfd = open(fb_dev, O_RDWR);
+    app->fbfd = open(fb_dev, O_RDWR);
 
-    if (fbfd < 0) {
+    if (app->fbfd < 0) {
         printf("Unable to open '%s': %s\n", fbdev, strerror(errno));
-        return 1;
+        return NULL;
     }
 
-    if (ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo)) {
+    if (ioctl(app->fbfd, FBIOGET_FSCREENINFO, &app->finfo)) {
         printf("IOCTL FBIOGET_FSCREENINFO Failed\n");
-        return 1;
+        return NULL;
     }
 
-    if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo)) {
+    if (ioctl(app->fbfd, FBIOGET_VSCREENINFO, &app->vinfo)) {
         printf("IOCTL FBIOGET_VSCREENINFO Failed\n");
-        return 1;
+        return NULL;
     }
 
-    print_fixed_info(&finfo, fbdev);
-    print_var_info(&vinfo, fbdev);
+    print_fixed_info(&app->finfo, fbdev);
+    print_var_info(&app->vinfo, fbdev);
 
-    memsize = finfo.smem_len;
-    data = (unsigned char *) mmap(0, memsize, PROT_WRITE, MAP_SHARED, fbfd, 0);
+    app->memsize = finfo.smem_len;
+    sur->data = (unsigned char *) mmap(0, app->memsize, PROT_WRITE, MAP_SHARED, app->fbfd, 0);
 
-    if (data == MAP_FAILED) {
+    if (sur->data == MAP_FAILED) {
         printf("mmap failed\n");
-        return 1;
+        return NULL;
     }
 
-    return 0;
+    return sur;
 }
 
-void close_fb() {
+int close_fb(struct Surface * surface) {
+    struct Surface_ScreenFrameBuffer * app;
+    app = surface->app_reserved;
 
-    if (data != MAP_FAILED && memsize > 0) {
-        munmap((char*) data, memsize);
+    if (surface->data != MAP_FAILED && app && app->memsize > 0) {
+        munmap((char*) surface->data, app->memsize);
     }
 
-    if (fbfd > 0) {
-        close(fbfd);
+    if (app->fbfd > 0) {
+        close(app->fbfd);
     }
 }
 
