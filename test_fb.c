@@ -15,8 +15,6 @@
 
 #include <linux/fb.h>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
 char * fb_dev = "/dev/fb0";
 
@@ -43,15 +41,16 @@ struct bmpfile_info {
 #pragma pack(0)
 
 struct Surface {
-    unsigned int xres;
-    unsigned int yres;
+    unsigned int x_res;
+    unsigned int y_res;
+    unsigned int bits_per_pixel;
 
     unsigned int format;
-    unsigned int line_lenght;
+    unsigned int line_length;
 
     unsigned char * data;
 
-    void * app_resereved;
+    void * app_reserved;
     
     /* Virtual Mehtod to call when we need to destory this surface */
     int (* destroy)(struct Surface *);
@@ -121,7 +120,7 @@ int copy(struct Surface *from, struct Surface *to, unsigned int x, unsigned int 
     int copy_yres;
 
     copy_ll = from->line_length;
-    copy_yres = to->yres;
+    copy_yres = to->y_res;
 
     /* */
     if (from->line_length > to->line_length - x) {
@@ -132,13 +131,14 @@ int copy(struct Surface *from, struct Surface *to, unsigned int x, unsigned int 
         copy_yres = to->y_res - y;
     }
 
-    for (i = 0; i <= copy_res; i++) {
+    for (i = 0; i <= copy_yres; i++) {
         memcpy( &from->data[(from->line_length * i)],
                 &to->data[(to->line_length * (y + i)) + x],
                 copy_ll );
     }
 }
 
+int close_fb(struct Surface * surface);
 
 struct Surface * open_fb(char * fbdev) {
     struct Surface * sur;
@@ -155,29 +155,42 @@ struct Surface * open_fb(char * fbdev) {
 
     if (app->fbfd < 0) {
         printf("Unable to open '%s': %s\n", fbdev, strerror(errno));
+        free(sur);
+        free(app);
         return NULL;
     }
 
     if (ioctl(app->fbfd, FBIOGET_FSCREENINFO, &app->finfo)) {
         printf("IOCTL FBIOGET_FSCREENINFO Failed\n");
+        free(sur);
+        free(app);
         return NULL;
     }
 
     if (ioctl(app->fbfd, FBIOGET_VSCREENINFO, &app->vinfo)) {
         printf("IOCTL FBIOGET_VSCREENINFO Failed\n");
+        free(sur);
+        free(app);
         return NULL;
     }
 
     print_fixed_info(&app->finfo, fbdev);
     print_var_info(&app->vinfo, fbdev);
 
-    app->memsize = finfo.smem_len;
+    app->memsize = app->finfo.smem_len;
     sur->data = (unsigned char *) mmap(0, app->memsize, PROT_WRITE, MAP_SHARED, app->fbfd, 0);
 
     if (sur->data == MAP_FAILED) {
         printf("mmap failed\n");
+        free(sur);
+        free(app);
         return NULL;
     }
+    
+    sur->x_res = app->vinfo.xres;
+    sur->y_res = app->vinfo.yres;
+    sur->bits_per_pixel = app->vinfo.bits_per_pixel;
+    sur->destroy = &close_fb;
 
     return sur;
 }
@@ -199,31 +212,35 @@ void show_bmp(const char *bmp, struct Surface * sur) {
     int bmpfd;
     struct bmpfile_header hrd;
     struct bmpfile_info bmi;
+    struct Surface_ScreenFrameBuffer * app;
+    
+    app = sur->app_reserved;
 
     bmpfd = open(bmp, O_RDONLY);
     read(bmpfd, &hrd, sizeof(struct bmpfile_header));
     read(bmpfd, &bmi, sizeof(struct bmpfile_info));
     lseek(bmpfd, hrd.bmp_offset, SEEK_SET);
 
-    if (bmi.width != vinfo.xres || bmi.height != vinfo.yres || bmi.bits != vinfo.bits_per_pixel) {
-        printf("Unsupported bitmap: %s is %dx%d (%d) but %dx%d (%d) was expected\n", bmp, bmi.width, bmi.height, bmi.bits, vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
+    if (bmi.width != sur->x_res || bmi.height != sur->y_res || bmi.bits != sur->bits_per_pixel) {
+        printf("Unsupported bitmap: %s is %dx%d (%d) but %dx%d (%d) was expected\n", bmp, bmi.width, bmi.height, bmi.bits, sur->x_res, sur->y_res, sur->bits_per_pixel);
     } else {
-        read(bmpfd, sur->data, memsize);
+        read(bmpfd, sur->data, app->memsize);
     }
     close(bmpfd);
 }
 
 int main(int argc, char * argv[]) {
 
-    if (open_fb("/dev/fb0")) {
-        close_fb();
+    struct Surface * sur;
+    sur = open_fb("/dev/fb0");
+
+    if (!sur) {
         return 1;
     }
 
-    show_bmp("background.bmp");
+    show_bmp("background.bmp", sur);
 
-    close_fb();
-
+    sur->destroy(sur);
     return 0;
 
 }
