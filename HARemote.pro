@@ -3,7 +3,7 @@ TARGET = HARemote
 CONFIG += qt debug
 
 unix:INCLUDEPATH += /usr/include/lua5.1
-unix:LIBS += -llua5.1
+unix:LIBS += -llua
 
 SOURCES += \
    main.cpp \
@@ -15,7 +15,14 @@ SOURCES += \
     apage.cpp \
     lua_page.cpp \
     lua_image.cpp \
-    aimage.cpp
+    aimage.cpp \
+    hastomp.cpp \
+    lua_core.cpp \
+    housekeepingobject.cpp \
+    alwaystopwidget.cpp \
+    simpletimewidget.cpp \
+    simplecurrentactionwidget.cpp \
+    newnotificationwidget.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -23,7 +30,14 @@ HEADERS += \
     script_internal.h \
     awidget.h \
     apage.h \
-    aimage.h
+    aimage.h \
+    hastomp.h \
+    housekeepingobject.h \
+    alwaystopwidget.h \
+    simpletimewidget.h \
+    simplecurrentactionwidget.h \
+    newnotificationwidget.h
 
 OTHER_FILES += \
-    main.lua
+    main.lua \
+    test.xml

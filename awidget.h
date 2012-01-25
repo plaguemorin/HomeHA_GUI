@@ -56,7 +56,6 @@ protected:
     int callback_hold;
 
 protected:
-    void paintEvent(QPaintEvent *);
     void timerEvent(QTimerEvent *event);
 };
 

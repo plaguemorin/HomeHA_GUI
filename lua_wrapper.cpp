@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <Qt/QtCore>
-
 extern "C" {
 #include <lua.h>
 #include <lauxlib.h>
@@ -34,6 +32,7 @@ void SCRIPT_StartWrapper() {
     SCRIPT_LibraryWidget_Load(L);
     SCRIPT_LibraryPage_Load(L);
     SCRIPT_LibraryImage_Load(L);
+    SCRIPT_LibraryCore_Load(L);
 }
 
 bool SCRIPT_ExecuteInitial() {
@@ -57,4 +56,19 @@ void SCRIPT_DoCallback_Widget(AWidget * widget, int callback) {
     lua_rawgeti(L, LUA_REGISTRYINDEX, callback);
     putwidget(L, widget);
     lua_pcall(L, 1, 0, 0);
+}
+
+void SCRIPT_DoCallback_Message(int callback, char ** headerKeys, char ** headerValues, const char * body, size_t headerSize, size_t bodySize) {
+    size_t i;
+    lua_rawgeti(L, LUA_REGISTRYINDEX, callback);
+
+    lua_newtable(L);
+    for (i = 0; i <= headerSize - 1; i++) {
+        lua_pushstring(L, headerKeys[i]);   /* Push the table index */
+        lua_pushstring(L, headerValues[i]); /* Push the cell value */
+        lua_settable(L, -3);
+    }
+
+    lua_pushlstring(L, body, bodySize);
+    lua_pcall(L, 2, 0, 0);
 }

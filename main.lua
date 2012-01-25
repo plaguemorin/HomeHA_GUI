@@ -4,10 +4,19 @@
 -- Home remote example --
 -------------------------
 
-print(GUI.version())
+local onMessage = function(headers, body)
+    print("In callback")
+
+    for i,v in pairs(headers) do print(i,v) end
+
+    print(body)
+    print("out of callback")
+end
+
+Core.onMessage(onMessage)
 
 image = Image.load("data/picture_frame.png")
-
+bg = Image.load("data/background.png")
 
 w = Widget.new("VOLUME")
 w:label("Volume")
@@ -44,5 +53,6 @@ b:attachToPage(homePage)
 c:attachToPage(tvPage)
 w:attachToPage(tvPage)
 
+tvPage:background(bg)
 -- GUI.backgroundColor(0.5, 0, 0)
 tvPage:present()

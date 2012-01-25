@@ -8,7 +8,7 @@ extern "C" {
 }
 
 #include "script_internal.h"
-#include "mainwindow.h"
+#include "housekeepingobject.h"
 #include "apage.h"
 
 
@@ -90,11 +90,22 @@ static int ScriptPage_Present(lua_State *L) {
     APage ** self;
     self = checkpage(L, 1);
 
-    printf("About to active page %s\n", (*self)->name());
-
-    MainWindow::getInstance()->presentPage(*self);
+    HouseKeepingObject::getInstance()->present(*self);
 
     return 0;
+}
+
+static int ScriptPage_Background(lua_State *L) {
+    APage ** self;
+    self = checkpage(L, 1);
+
+    if (lua_isuserdata(L, 2)) {
+        (*self)->setBackground(* checkimage(L, 2));
+        return 0;
+    } else {
+        putimage(L, (*self)->background());
+        return 1;
+    }
 }
 
 /*-----------------------------------------------------------------------------------------*/
@@ -115,6 +126,7 @@ static int ScriptPage__tostring(lua_State *L) {
 static const luaL_Reg pageMethodsLib[] = {
     { "new", ScriptPage_New },
     { "present", ScriptPage_Present },
+    { "background", ScriptPage_Background },
     { NULL, NULL }
 };
 

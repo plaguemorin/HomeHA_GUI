@@ -2,7 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "hastomp.h"
+
 class APage;
+class QBoxLayout;
+class AlwaysTopWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -10,16 +14,17 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
 
-    static MainWindow * getInstance();
-
+    APage * currentPage();
     void presentPage(APage *);
+    void buildLayout();
 
 signals:
 
-public slots:
-
 private:
-    APage * currentPage;
+    APage * m_currentPage;
+    QBoxLayout * layout;
+
+    AlwaysTopWidget * topWidget;
 
 };
 

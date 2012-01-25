@@ -13,6 +13,7 @@ int SCRIPT_LibraryGUI_Load(lua_State *);
 int SCRIPT_LibraryWidget_Load(lua_State *);
 int SCRIPT_LibraryPage_Load(lua_State *);
 int SCRIPT_LibraryImage_Load(lua_State *);
+int SCRIPT_LibraryCore_Load(lua_State * );
 
 void putwidget(lua_State *, AWidget *);
 

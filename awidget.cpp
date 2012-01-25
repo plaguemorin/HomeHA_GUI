@@ -68,7 +68,8 @@ int AWidget::y() {
 }
 
 void AWidget::setPosition(int x, int y) {
-    QWidget::move(x, y);
+    qDebug() << "Moving " << this->tag << " to " << x << y;
+    move(x, y);
 }
 
 void AWidget::setVisibility(bool visible) {
@@ -148,11 +149,6 @@ void AWidget::setImage(AImage * a) {
 
 AImage * AWidget::image() {
     return this->widgetBgImage;
-}
-
-void AWidget::paintEvent(QPaintEvent * paintEvent) {
-    paintEvent->accept();
-    //QWidget::paintEvent(paintEvent);
 }
 
 
